@@ -5,7 +5,6 @@ import os
 from dotenv import load_dotenv
 import telebot
 from keyboards import main_keyboard, delete_markup, show_markup, markup_choices, commands
-from telegram_bot_calendar import DetailedTelegramCalendar, LSTEP
 from questions import QUESTIONS
 from PIL import Image, ImageDraw, ImageFont
 import pandas as pd
@@ -19,7 +18,7 @@ session = Session()
 @bot.message_handler(['help', 'start'])
 def greet(message):
     
-    user = User(яся
+    user = User(
         telegram_id=message.from_user.id,
         first_name=message.from_user.first_name,
         last_name=message.from_user.last_name,
@@ -148,11 +147,7 @@ def process_questions(message, user, status):
         status = len(user.questionnaire)
         if status < len(QUESTIONS):
             question = [question for question in QUESTIONS if question['id'] == status][0]
-            if question["choices"] == 'calendar':  
-                calendar, step = DetailedTelegramCalendar().build()
-                msg = bot.send_message(message.chat.id, f"{question['text']} Выбери {LSTEP[step]}", reply_markup=calendar)
-            else:
-                msg = bot.send_message(message.chat.id, question['text'], reply_markup=markup_choices(question["choices"]))
+            msg = bot.send_message(message.chat.id, question['text'], reply_markup=markup_choices(question["choices"]))
             bot.register_next_step_handler(msg, lambda m: process_questions(m, user, status))
         else:
             bot.send_message(
